@@ -43,8 +43,8 @@ public class ContribHacker {
 	private static final String CALENDAR_URL = "https://github.com/users/" +
 		USER_TOKEN + "/contributions_calendar_data";
 
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
-		"yyyy/MM/dd");
+	private static final SimpleDateFormat DATE_FORMAT =
+		new SimpleDateFormat("yyyy/MM/dd");
 
 	private static final int CAL_WIDTH = 54;
 	private static final int CAL_HEIGHT = 7;
@@ -69,15 +69,14 @@ public class ContribHacker {
 	private String githubUser = "ctrueden";//TEMP
 
 	@Option(name = "-o", aliases = {"--output-dir"},
-		usage = "the directory to populate the Git repository")
+		usage = "the directory where the Git repository should be populated")
 	private File gitDir;
 
-	@Option(name = "-g", aliases = { "--gui" },
+	@Option(name = "-g", aliases = {"--gui"},
 		usage = "display progress in a graphical window")
 	private boolean showGUI = true;//TEMP
 
-	@Option(name = "-d", aliases = {"--debug"},
-		usage = "debug mode")
+	@Option(name = "-d", aliases = {"--debug"}, usage = "debug mode")
 	private boolean debug = true;//TEMP
 
 	// -- Fields --
@@ -92,7 +91,7 @@ public class ContribHacker {
 
 	// -- Main method --
 
-	public static void main(String[] args) throws Exception {
+	public static void main(final String[] args) throws Exception {
 		final ContribHacker contribHacker = new ContribHacker();
 		contribHacker.parseArgs(args);
 		contribHacker.execute();
@@ -113,7 +112,7 @@ public class ContribHacker {
 				throw new CmdLineException(parser, "No GitHub user given");
 			}
 		}
-		catch (CmdLineException e) {
+		catch (final CmdLineException e) {
 			System.err.println(e.getMessage());
 			System.err.println();
 
@@ -139,8 +138,8 @@ public class ContribHacker {
 
 		// compute total number of iterations
 		int total = 0;
-		for (int x=0; x<CAL_WIDTH; x++) {
-			for (int y=0; y<CAL_HEIGHT; y++) {
+		for (int x = 0; x < CAL_WIDTH; x++) {
+			for (int y = 0; y < CAL_HEIGHT; y++) {
 				if (contrib[y][x] == null) continue;
 				total += contrib[y][x].target - contrib[y][x].current;
 			}
@@ -149,8 +148,8 @@ public class ContribHacker {
 		if (showGUI) showProgressFrame(total);
 
 		int i = 0;
-		for (int x=0; x<CAL_WIDTH; x++) {
-			for (int y=0; y<CAL_HEIGHT; y++) {
+		for (int x = 0; x < CAL_WIDTH; x++) {
+			for (int y = 0; y < CAL_HEIGHT; y++) {
 				if (contrib[y][x] == null) continue;
 				while (contrib[y][x].current < contrib[y][x].target) {
 					contrib[y][x].current++;
@@ -185,7 +184,8 @@ public class ContribHacker {
 		}
 
 		// read and scale input image
-		final BufferedImage image = scale(ImageIO.read(imageFile), CAL_WIDTH, CAL_HEIGHT);
+		final BufferedImage image =
+			scale(ImageIO.read(imageFile), CAL_WIDTH, CAL_HEIGHT);
 
 		// convert to 2-bit grayscale data
 		final int[][] pix = new int[CAL_HEIGHT][CAL_WIDTH];
@@ -295,11 +295,11 @@ public class ContribHacker {
 		}
 	}
 
-	private void debug(String msg) {
+	private void debug(final String msg) {
 		if (debug) System.out.println(msg);
 	}
 
-	private int scale(final int pixel, int scale) {
+	private int scale(final int pixel, final int scale) {
 		return scale * (4 - pixel);
 	}
 
@@ -352,28 +352,30 @@ public class ContribHacker {
 
 	private void initGitRepository() throws IOException {
 		if (gitDir == null) {
-			System.err.println("Warning: no output directory " +
-				"given for git repository; simulating result");
+			System.err.println("Warning: no output directory "
+				+ "given for git repository; simulating result");
+			return;
 		}
-		else {
-			// TODO: parse from GitHub user info
-			author = new PersonIdent("Curtis Rueden", "ctrueden@wisc.edu");
 
-			if (!gitDir.exists()) {
-				final boolean success = gitDir.mkdirs();
-				if (!success) {
-					throw new IOException("Could not create Git output directory: " +
-						gitDir);
-				}
+		// TODO: parse from GitHub user info
+		author = new PersonIdent("Curtis Rueden", "ctrueden@wisc.edu");
+
+		if (!gitDir.exists()) {
+			final boolean success = gitDir.mkdirs();
+			if (!success) {
+				throw new IOException("Could not create Git output directory: " +
+					gitDir);
 			}
-			final FileRepository repos = new FileRepository(gitDir);
-			repos.create();
-			git = Git.wrap(repos);
 		}
+
+		final FileRepository repos = new FileRepository(gitDir);
+		repos.create();
+		git = Git.wrap(repos);
 	}
 
 	private void showProgressFrame(final int total) {
 		final JPanel calendarPane = new JPanel() {
+
 			private final int tileSize = 12, tileTotal = 15;
 			private final Dimension prefSize =
 				new Dimension(CAL_WIDTH * tileTotal, CAL_HEIGHT * tileTotal);
@@ -382,8 +384,8 @@ public class ContribHacker {
 			public void paint(final Graphics g) {
 				super.paint(g);
 				final int step = maxContrib / 4;
-				for (int y=0; y<CAL_HEIGHT; y++) {
-					for (int x=0; x<CAL_WIDTH; x++) {
+				for (int y = 0; y < CAL_HEIGHT; y++) {
+					for (int x = 0; x < CAL_WIDTH; x++) {
 						if (contrib[y][x] == null) continue;
 						final int colorIndex = (contrib[y][x].current - 1) / step;
 						g.setColor(CAL_COLORS[colorIndex]);
@@ -396,6 +398,7 @@ public class ContribHacker {
 			public Dimension getPreferredSize() {
 				return prefSize;
 			}
+
 		};
 		calendarPane.setBorder(new LineBorder(Color.red));
 
@@ -411,7 +414,8 @@ public class ContribHacker {
 		progressFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		progressFrame.setContentPane(contentPane);
 		progressFrame.pack();
-		progressFrame.setLocation(new Point(200, 200));//TODO center it
+		// TODO: Center the frame.
+		progressFrame.setLocation(new Point(200, 200));
 		progressFrame.setVisible(true);
 	}
 
@@ -423,9 +427,11 @@ public class ContribHacker {
 	// -- Helper classes --
 
 	private static class Contrib {
+
 		private Date date;
 		private int current;
 		private int target;
+
 	}
 
 }
