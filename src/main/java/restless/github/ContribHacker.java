@@ -28,6 +28,7 @@ import javax.swing.border.LineBorder;
 
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.storage.file.FileRepository;
 import org.kohsuke.args4j.CmdLineException;
@@ -127,7 +128,7 @@ public class ContribHacker {
 		}
 	}
 
-	public void execute() throws IOException, ParseException {
+	public void execute() throws IOException, ParseException, GitAPIException {
 		final int[][] pix = readPixels();
 
 		readContributions();
@@ -152,14 +153,8 @@ public class ContribHacker {
 			for (int y=0; y<CAL_HEIGHT; y++) {
 				if (contrib[y][x] == null) continue;
 				while (contrib[y][x].current < contrib[y][x].target) {
-					if (git != null) {
-						final CommitCommand commit = git.commit();
-						commit.setAll(true);
-//						commit.setAuthor(new PersonIdent(author), date);
-//						commit.setMessage(msg);
-//						commit.call();
-					}
 					contrib[y][x].current++;
+					if (git != null) doCommit(y, x);
 					i++;
 					if (showGUI) updateProgress(i);
 					try { Thread.sleep(1); } catch (Exception e) { }
@@ -170,6 +165,14 @@ public class ContribHacker {
 		progressFrame.dispose();
 
 		if (debug) System.out.println("Complete!");
+	}
+
+	private void doCommit(final int y, final int x) throws GitAPIException {
+		final CommitCommand commit = git.commit();
+		commit.setAll(true);
+		commit.setAuthor(new PersonIdent(author, contrib[y][x].date));
+		commit.setMessage("Pixel (" + y + ", " + x + "): " + contrib[y][x].current);
+		commit.call();
 	}
 
 	// -- Helper methods --
