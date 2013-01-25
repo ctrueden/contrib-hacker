@@ -49,7 +49,7 @@ public class ContribHacker {
 	private static final int CAL_WIDTH = 54;
 	private static final int CAL_HEIGHT = 7;
 
-	private static final String CHARS = "#+-.";
+	private static final String CAL_ASCII = "#+-.";
 
 	private static final Color[] CAL_COLORS = {
 		new Color(214, 230, 133),
@@ -202,13 +202,27 @@ public class ContribHacker {
 
 				// convert 8-bit to 2-bit (4 possible values)
 				pix[y][x] = gray / 64;
-
-				System.out.print(CHARS.charAt(pix[y][x]));
 			}
-			System.out.println();
 		}
-		System.out.println();
+		System.out.println(asciiCalendar(true));
 		return pix;
+	}
+
+	private String asciiCalendar(final boolean target) {
+		final String newLine = System.getProperty("line.separator");
+		final StringBuilder sb = new StringBuilder();
+		final int step = maxContrib / 4;
+		for (int y = 0; y < CAL_HEIGHT; y++) {
+			for (int x = 0; x < CAL_WIDTH; x++) {
+				if (contrib[y][x] == null) sb.append(" ");
+				final int value =
+					target ? contrib[y][x].target : contrib[y][x].current;
+				final int index = (value - 1) / step;
+				sb.append(CAL_ASCII.charAt(index));
+			}
+			sb.append(newLine);
+		}
+		return sb.toString();
 	}
 
 	/** Rescales the given image to the specified width and height. */
