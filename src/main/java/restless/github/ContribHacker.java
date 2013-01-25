@@ -11,8 +11,10 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,6 +28,7 @@ import javax.swing.JProgressBar;
 import javax.swing.WindowConstants;
 import javax.swing.border.LineBorder;
 
+import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -58,6 +61,8 @@ public class ContribHacker {
 		new Color(30, 104, 35)
 	};
 
+	private static final String ASCII_CALENDAR_FILE = "contrib.txt";
+
 	// -- Command line arguments (thank you args4j!) --
 
 	@Option(name = "-i", aliases = {"--image"},
@@ -85,6 +90,7 @@ public class ContribHacker {
 	private int maxContrib;
 
 	private Git git;
+	private File asciiCalendarFile;
 	private PersonIdent author;
 	private JFrame progressFrame;
 	private JProgressBar progressBar;
@@ -166,9 +172,21 @@ public class ContribHacker {
 		if (debug) System.out.println("Complete!");
 	}
 
-	private void doCommit(final int y, final int x) throws GitAPIException {
+	private void doCommit(final int y, final int x)
+		throws FileNotFoundException, GitAPIException
+	{
+		// update ASCII calendar file
+		final PrintWriter out = new PrintWriter(asciiCalendarFile);
+		out.print(asciiCalendar(false));
+		out.close();
+
+		// add ASCII calendar file to changeset
+		final AddCommand add = git.add();
+		add.addFilepattern(ASCII_CALENDAR_FILE);
+		add.call();
+
+		// commit the changes
 		final CommitCommand commit = git.commit();
-		commit.setAll(true);
 		commit.setAuthor(new PersonIdent(author, contrib[y][x].date));
 		commit.setMessage("Pixel (" + y + ", " + x + "): " + contrib[y][x].current);
 		commit.call();
@@ -385,6 +403,8 @@ public class ContribHacker {
 		final FileRepository repos = new FileRepository(gitDir);
 		repos.create();
 		git = Git.wrap(repos);
+
+		asciiCalendarFile = new File(gitDir, ASCII_CALENDAR_FILE);
 	}
 
 	private void showProgressFrame(final int total) {
