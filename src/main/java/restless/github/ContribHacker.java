@@ -359,6 +359,13 @@ public class ContribHacker {
 			// TODO: parse from GitHub user info
 			author = new PersonIdent("Curtis Rueden", "ctrueden@wisc.edu");
 
+			if (!gitDir.exists()) {
+				final boolean success = gitDir.mkdirs();
+				if (!success) {
+					throw new IOException("Could not create Git output directory: " +
+						gitDir);
+				}
+			}
 			final FileRepository repos = new FileRepository(gitDir);
 			repos.create();
 			git = Git.wrap(repos);
