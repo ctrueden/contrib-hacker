@@ -16,10 +16,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -32,7 +30,6 @@ import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.storage.file.FileRepository;
-import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -81,10 +78,6 @@ public class ContribHacker {
 	@Option(name = "-d", aliases = {"--debug"},
 		usage = "debug mode")
 	private boolean debug = true;//TEMP
-
-	/** Command line parameters that are not options. */
-	@Argument
-	private List<String> arguments = new ArrayList<String>();
 
 	// -- Fields --
 
