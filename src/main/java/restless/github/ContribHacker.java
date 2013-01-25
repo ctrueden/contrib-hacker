@@ -54,10 +54,10 @@ public class ContribHacker {
 	private static final String CHARS = "#+-.";
 
 	private static final Color[] CAL_COLORS = {
-		Color.GREEN.brighter(),
-		Color.GREEN,
-		Color.GREEN.darker(),
-		Color.GREEN.darker().darker()
+		new Color(214, 230, 133),
+		new Color(140, 198, 101),
+		new Color(68, 163, 64),
+		new Color(30, 104, 35)
 	};
 
 	// -- Command line arguments (thank you args4j!) --
