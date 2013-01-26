@@ -59,7 +59,7 @@ public class ContribHacker {
 	private static final int CAL_WIDTH = 54;
 	private static final int CAL_HEIGHT = 7;
 
-	private static final String CAL_ASCII = "#+-.";
+	private static final String CAL_ASCII = ".-+#";
 
 	private static final Color[] CAL_COLORS = {
 		new Color(214, 230, 133),
@@ -212,7 +212,10 @@ public class ContribHacker {
 		final int step = maxContrib / 4;
 		for (int y = 0; y < CAL_HEIGHT; y++) {
 			for (int x = 0; x < CAL_WIDTH; x++) {
-				if (contrib[y][x] == null) sb.append(" ");
+				if (contrib[y][x] == null) {
+					sb.append(" ");
+					continue;
+				}
 				final int value =
 					target ? contrib[y][x].target : contrib[y][x].current;
 				final int index = (value - 1) / step;
