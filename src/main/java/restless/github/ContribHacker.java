@@ -147,7 +147,11 @@ public class ContribHacker {
 
 		readContributions();
 		computeTargetContrib(pix);
-		if (debug) printContrib();
+
+		if (debug) {
+			debug(asciiImage(true));
+			printContrib();
+		}
 
 		initGitRepository();
 
@@ -162,7 +166,6 @@ public class ContribHacker {
 					if (git != null) doCommit(y, x);
 					i++;
 					if (showGUI) updateProgress(i);
-					try { Thread.sleep(1); } catch (Exception e) { }
 				}
 			}
 		}
@@ -202,7 +205,6 @@ public class ContribHacker {
 				pix[y][x] = gray / 64;
 			}
 		}
-		System.out.println(asciiImage(true));
 		return pix;
 	}
 
@@ -340,7 +342,6 @@ public class ContribHacker {
 
 	/** Debugging method for outputting the contributions table. */
 	private void printContrib() {
-		System.out.println();
 		System.out.println("-- Current Contributions --");
 		for (int y = 0; y < contrib.length; y++) {
 			for (int x = 0; x < contrib[y].length; x++) {
