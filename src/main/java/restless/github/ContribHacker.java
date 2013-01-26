@@ -68,7 +68,8 @@ public class ContribHacker {
 		new Color(30, 104, 35)
 	};
 
-	private static final String ASCII_CALENDAR_FILE = "contrib.txt";
+	private static final String ASCII_IMAGE_FILE = "image.txt";
+	private static final String CALENDAR_DATA_FILE = "data.txt";
 
 	// -- Command line arguments (thank you args4j!) --
 
@@ -97,7 +98,8 @@ public class ContribHacker {
 	private int maxContrib;
 
 	private Git git;
-	private File asciiCalendarFile;
+	private File asciiImageFile;
+	private File calendarDataFile;
 	private PersonIdent author;
 	private JFrame progressFrame;
 	private JProgressBar progressBar;
@@ -170,28 +172,6 @@ public class ContribHacker {
 		if (debug) System.out.println("Complete!");
 	}
 
-	private void doCommit(final int y, final int x)
-		throws FileNotFoundException, GitAPIException
-	{
-		// update ASCII calendar file
-		final PrintWriter out = new PrintWriter(asciiCalendarFile);
-		out.print(asciiCalendar(false));
-		out.close();
-
-		// add ASCII calendar file to changeset
-		final AddCommand add = git.add();
-		add.addFilepattern(ASCII_CALENDAR_FILE);
-		add.call();
-
-		// commit the changes
-		final CommitCommand commit = git.commit();
-		commit.setAuthor(new PersonIdent(author, contrib[y][x].date));
-		final String message = "(" + y + ", " + x + ") -> " +
-			contrib[y][x].current + COMMIT_NOTICE;
-		commit.setMessage(message);
-		commit.call();
-	}
-
 	// -- Helper methods --
 
 	/** Reads the given image file, converting it to 54x7, 2-bit grayscale. */
@@ -222,11 +202,11 @@ public class ContribHacker {
 				pix[y][x] = gray / 64;
 			}
 		}
-		System.out.println(asciiCalendar(true));
+		System.out.println(asciiImage(true));
 		return pix;
 	}
 
-	private String asciiCalendar(final boolean target) {
+	private String asciiImage(final boolean target) {
 		final String newLine = System.getProperty("line.separator");
 		final StringBuilder sb = new StringBuilder();
 		final int step = maxContrib / 4;
@@ -282,9 +262,7 @@ public class ContribHacker {
 				y = calendar.get(Calendar.DAY_OF_WEEK) - 1;
 			}
 
-			contrib[y][x] = new Contrib();
-			contrib[y][x].date = date;
-			contrib[y][x].current = Integer.parseInt(count);
+			contrib[y][x] = new Contrib(date, Integer.parseInt(count));
 
 			y++;
 			if (y > 6) {
@@ -337,9 +315,10 @@ public class ContribHacker {
 
 	/** Converts the given date string to a {@link Date} object. */
 	private Date asDate(final String date) throws ParseException {
-		final int lQuote = date.indexOf("\"");
-		final int rQuote = date.lastIndexOf("\"");
-		return DATE_FORMAT.parse(date.substring(lQuote + 1, rQuote));
+		final int quote = date.indexOf("\"");
+		final String unwrappedDate = quote < 0 ? date :
+			date.substring(quote + 1, date.lastIndexOf("\""));
+		return DATE_FORMAT.parse(unwrappedDate);
 	}
 
 	/** Gets the contents of the given URL as a string. */
@@ -404,7 +383,46 @@ public class ContribHacker {
 		repos.create();
 		git = Git.wrap(repos);
 
-		asciiCalendarFile = new File(gitDir, ASCII_CALENDAR_FILE);
+		asciiImageFile = new File(gitDir, ASCII_IMAGE_FILE);
+		calendarDataFile = new File(gitDir, CALENDAR_DATA_FILE);
+	}
+
+	private void doCommit(final int y, final int x)
+		throws FileNotFoundException, GitAPIException
+	{
+		// update files
+		updateImageFile();
+		updateDataFile();
+
+		// add files to changeset
+		final AddCommand add = git.add();
+		add.addFilepattern(ASCII_IMAGE_FILE);
+		add.addFilepattern(CALENDAR_DATA_FILE);
+		add.call();
+
+		// commit the changes
+		final CommitCommand commit = git.commit();
+		commit.setAuthor(new PersonIdent(author, contrib[y][x].date));
+		final String message = "(" + y + ", " + x + ") -> " +
+			contrib[y][x].current + COMMIT_NOTICE;
+		commit.setMessage(message);
+		commit.call();
+	}
+
+	private void updateImageFile() throws FileNotFoundException {
+		final PrintWriter out = new PrintWriter(asciiImageFile);
+		out.print(asciiImage(false));
+		out.close();
+	}
+
+	private void updateDataFile() throws FileNotFoundException {
+		final PrintWriter out = new PrintWriter(calendarDataFile);
+		for (int y = 0; y < CAL_HEIGHT; y++) {
+			for (int x = 0; x < CAL_WIDTH; x++) {
+				out.println(contrib[y][x]);
+			}
+		}
+		out.close();
 	}
 
 	private void showProgressFrame() {
@@ -472,8 +490,19 @@ public class ContribHacker {
 	private static class Contrib {
 
 		private Date date;
+		private int initial;
 		private int current;
 		private int target;
+
+		public Contrib(final Date date, final int initial) {
+			this.date = date;
+			this.initial = current = initial;
+		}
+
+		@Override
+		public String toString() {
+			return DATE_FORMAT.format(date) + ": " + (current - initial);
+		}
 
 	}
 
