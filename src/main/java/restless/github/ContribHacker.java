@@ -149,16 +149,7 @@ public class ContribHacker {
 
 		initGitRepository();
 
-		// compute total number of iterations
-		int total = 0;
-		for (int x = 0; x < CAL_WIDTH; x++) {
-			for (int y = 0; y < CAL_HEIGHT; y++) {
-				if (contrib[y][x] == null) continue;
-				total += contrib[y][x].target - contrib[y][x].current;
-			}
-		}
-
-		if (showGUI) showProgressFrame(total);
+		if (showGUI) showProgressFrame();
 
 		int i = 0;
 		for (int x = 0; x < CAL_WIDTH; x++) {
@@ -416,7 +407,16 @@ public class ContribHacker {
 		asciiCalendarFile = new File(gitDir, ASCII_CALENDAR_FILE);
 	}
 
-	private void showProgressFrame(final int total) {
+	private void showProgressFrame() {
+		// compute total number of iterations
+		int total = 0;
+		for (int x = 0; x < CAL_WIDTH; x++) {
+			for (int y = 0; y < CAL_HEIGHT; y++) {
+				if (contrib[y][x] == null) continue;
+				total += contrib[y][x].target - contrib[y][x].current;
+			}
+		}
+
 		final JPanel calendarPane = new JPanel() {
 
 			private final int tileSize = 12, tileTotal = 15;
