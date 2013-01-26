@@ -31,9 +31,9 @@ import javax.swing.border.LineBorder;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.PersonIdent;
-import org.eclipse.jgit.storage.file.FileRepository;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -361,7 +361,7 @@ public class ContribHacker {
 		}
 	}
 
-	private void initGitRepository() throws IOException {
+	private void initGitRepository() throws IOException, GitAPIException {
 		if (gitDir == null) {
 			System.err.println("Warning: no output directory "
 				+ "given for git repository; simulating result");
@@ -379,9 +379,11 @@ public class ContribHacker {
 			}
 		}
 
-		final FileRepository repos = new FileRepository(gitDir);
-		repos.create();
-		git = Git.wrap(repos);
+		final InitCommand init = Git.init();
+		init.setDirectory(gitDir);
+		init.call();
+
+		git = Git.open(gitDir);
 
 		asciiImageFile = new File(gitDir, ASCII_IMAGE_FILE);
 		calendarDataFile = new File(gitDir, CALENDAR_DATA_FILE);
