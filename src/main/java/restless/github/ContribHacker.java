@@ -474,6 +474,7 @@ public class ContribHacker {
 
 		progressBar = new JProgressBar();
 		progressBar.setMaximum(total);
+		progressBar.setStringPainted(true);
 
 		final JPanel contentPane = new JPanel();
 		contentPane.setLayout(new BorderLayout());
@@ -497,7 +498,13 @@ public class ContribHacker {
 
 	/** Updates the graphical progress window. */
 	private void updateProgress(final int value) {
+		// update progress bar
 		progressBar.setValue(value);
+		final int previous = 100 * (value - 1) / progressBar.getMaximum();
+		final int current = 100 * value / progressBar.getMaximum();
+		if (previous != current) progressBar.setString("" + current + "%");
+
+		// redraw calendar graphic
 		progressFrame.repaint();
 	}
 
