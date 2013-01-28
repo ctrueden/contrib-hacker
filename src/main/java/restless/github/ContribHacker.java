@@ -481,7 +481,7 @@ public class ContribHacker {
 		contentPane.add(progressBar, BorderLayout.SOUTH);
 
 		progressFrame = new JFrame("Contribution Hacker");
-		progressFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		progressFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		progressFrame.setContentPane(contentPane);
 		progressFrame.pack();
 
