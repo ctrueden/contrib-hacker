@@ -38,6 +38,15 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+/**
+ * This program hacks your GitHub Contributions Calendar to match an image.
+ * <p>
+ * More specifically, given an image file and GitHub username as input, it
+ * creates and populates a dummy Git repository, which when pushed to that
+ * user's public space will result in that user's Contributions Calendar
+ * matching the specified image.
+ * </p>
+ */
 public class ContribHacker {
 
 	// -- Constants --
@@ -114,6 +123,7 @@ public class ContribHacker {
 
 	// -- ContribHacker methods --
 
+	/** Parses the command line arguments, populating the instance fields. */
 	public void parseArgs(final String[] args) {
 		final CmdLineParser parser = new CmdLineParser(this);
 
@@ -132,7 +142,8 @@ public class ContribHacker {
 			System.err.println();
 
 			// print usage instructions
-			System.err.println("TODO [options...] arguments...");
+			System.err.println("java -jar contrib-hacker-all-1.0.0-SNAPSHOT.jar " +
+				"[options...] arguments...");
 
 			// print the list of available options
 			parser.printUsage(System.err);
@@ -142,9 +153,9 @@ public class ContribHacker {
 		}
 	}
 
+	/** Generates the Git repository according to the current settings. */
 	public void execute() throws IOException, ParseException, GitAPIException {
 		final int[][] pix = readPixels();
-
 		readContributions();
 		computeTargetContrib(pix);
 
@@ -155,7 +166,7 @@ public class ContribHacker {
 
 		initGitRepository();
 
-		if (showGUI) showProgressFrame();
+		if (showGUI) showProgressWindow();
 
 		int i = 0;
 		for (int x = 0; x < CAL_WIDTH; x++) {
@@ -175,7 +186,7 @@ public class ContribHacker {
 		if (debug) System.out.println("Complete!");
 	}
 
-	// -- Helper methods --
+	// -- Helper methods - setup --
 
 	/** Reads the given image file, converting it to 54x7, 2-bit grayscale. */
 	private int[][] readPixels() throws IOException {
@@ -206,26 +217,6 @@ public class ContribHacker {
 			}
 		}
 		return pix;
-	}
-
-	private String asciiImage(final boolean target) {
-		final String newLine = System.getProperty("line.separator");
-		final StringBuilder sb = new StringBuilder();
-		final int step = maxContrib / 4;
-		for (int y = 0; y < CAL_HEIGHT; y++) {
-			for (int x = 0; x < CAL_WIDTH; x++) {
-				if (contrib[y][x] == null) {
-					sb.append(" ");
-					continue;
-				}
-				final int value =
-					target ? contrib[y][x].target : contrib[y][x].current;
-				final int index = (value - 1) / step;
-				sb.append(CAL_ASCII.charAt(index));
-			}
-			sb.append(newLine);
-		}
-		return sb.toString();
 	}
 
 	/** Rescales the given image to the specified width and height. */
@@ -278,6 +269,20 @@ public class ContribHacker {
 		}
 	}
 
+	/** Gets the contents of the given URL as a string. */
+	private String readContents(final URL url) throws IOException {
+		final BufferedReader in =
+			new BufferedReader(new InputStreamReader(url.openStream()));
+		final StringBuilder sb = new StringBuilder();
+		while (true) {
+			final String line = in.readLine();
+			if (line == null) break; // eof
+			sb.append(line);
+		}
+		in.close();
+		return sb.toString();
+	}
+
 	/**
 	 * Computes a modified contributions table based on the existing one and
 	 * desired final image.
@@ -310,12 +315,37 @@ public class ContribHacker {
 		}
 	}
 
-	private void debug(final String msg) {
-		if (debug) System.out.println(msg);
-	}
-
+	/** Scales the given inverted pixel value by the specified scale factor. */
 	private int scale(final int pixel, final int scale) {
 		return scale * (4 - pixel);
+	}
+
+	// -- Helper methods - miscellaneous --
+
+	/**
+	 * Generates an ASCII image string.
+	 * 
+	 * @param target If true, the image matches the target contributions; if
+	 *          false, the image matches the current ones.
+	 */
+	private String asciiImage(final boolean target) {
+		final String newLine = System.getProperty("line.separator");
+		final StringBuilder sb = new StringBuilder();
+		final int step = maxContrib / 4;
+		for (int y = 0; y < CAL_HEIGHT; y++) {
+			for (int x = 0; x < CAL_WIDTH; x++) {
+				if (contrib[y][x] == null) {
+					sb.append(" ");
+					continue;
+				}
+				final int value =
+					target ? contrib[y][x].target : contrib[y][x].current;
+				final int index = (value - 1) / step;
+				sb.append(CAL_ASCII.charAt(index));
+			}
+			sb.append(newLine);
+		}
+		return sb.toString();
 	}
 
 	/** Converts the given date string to a {@link Date} object. */
@@ -326,45 +356,9 @@ public class ContribHacker {
 		return DATE_FORMAT.parse(unwrappedDate);
 	}
 
-	/** Gets the contents of the given URL as a string. */
-	private String readContents(final URL url) throws IOException {
-		final BufferedReader in =
-			new BufferedReader(new InputStreamReader(url.openStream()));
-		final StringBuilder sb = new StringBuilder();
-		while (true) {
-			final String line = in.readLine();
-			if (line == null) break; // eof
-			sb.append(line);
-		}
-		in.close();
-		return sb.toString();
-	}
+	// -- Helper methods - Git --
 
-	/** Debugging method for outputting the contributions table. */
-	private void printContrib() {
-		System.out.println("-- Current Contributions --");
-		for (int y = 0; y < contrib.length; y++) {
-			for (int x = 0; x < contrib[y].length; x++) {
-				String s = contrib[y][x] == null ? "-" : ("" + contrib[y][x].current);
-				while (s.length() < 4)
-					s = " " + s;
-				System.out.print(s);
-			}
-			System.out.println();
-		}
-		System.out.println();
-		System.out.println("-- Target Contributions --");
-		for (int y = 0; y < contrib.length; y++) {
-			for (int x = 0; x < contrib[y].length; x++) {
-				String s = contrib[y][x] == null ? "-" : ("" + contrib[y][x].target);
-				while (s.length() < 4)
-					s = " " + s;
-				System.out.print(s);
-			}
-			System.out.println();
-		}
-	}
-
+	/** Initializes the Git repository. */
 	private void initGitRepository() throws IOException, GitAPIException {
 		if (gitDir == null) {
 			System.err.println("Warning: no output directory "
@@ -393,6 +387,7 @@ public class ContribHacker {
 		calendarDataFile = new File(gitDir, CALENDAR_DATA_FILE);
 	}
 
+	/** Updates the repository files and makes a commit. */
 	private void doCommit(final int y, final int x)
 		throws FileNotFoundException, GitAPIException
 	{
@@ -415,12 +410,14 @@ public class ContribHacker {
 		commit.call();
 	}
 
+	/** Writes an updated ASCII image file to disk. */
 	private void updateImageFile() throws FileNotFoundException {
 		final PrintWriter out = new PrintWriter(asciiImageFile);
 		out.print(asciiImage(false));
 		out.close();
 	}
 
+	/** Writes an updated calendar data file to disk. */
 	private void updateDataFile() throws FileNotFoundException {
 		final PrintWriter out = new PrintWriter(calendarDataFile);
 		for (int y = 0; y < CAL_HEIGHT; y++) {
@@ -431,7 +428,10 @@ public class ContribHacker {
 		out.close();
 	}
 
-	private void showProgressFrame() {
+	// -- Helper methods - GUI --
+
+	/** Displays the graphical progress window. */
+	private void showProgressWindow() {
 		// compute total number of iterations
 		int total = 0;
 		for (int x = 0; x < CAL_WIDTH; x++) {
@@ -486,13 +486,47 @@ public class ContribHacker {
 		progressFrame.setVisible(true);
 	}
 
+	/** Updates the graphical progress window. */
 	private void updateProgress(final int value) {
 		progressBar.setValue(value);
 		progressFrame.repaint();
 	}
 
+	// -- Helper methods - debugging --
+
+	/** Emits the given message to stdout, if the debug flag is set. */
+	private void debug(final String msg) {
+		if (debug) System.out.println(msg);
+	}
+
+	/** Debugging method for outputting the contributions table. */
+	private void printContrib() {
+		System.out.println("-- Current Contributions --");
+		for (int y = 0; y < contrib.length; y++) {
+			for (int x = 0; x < contrib[y].length; x++) {
+				String s = contrib[y][x] == null ? "-" : ("" + contrib[y][x].current);
+				while (s.length() < 4)
+					s = " " + s;
+				System.out.print(s);
+			}
+			System.out.println();
+		}
+		System.out.println();
+		System.out.println("-- Target Contributions --");
+		for (int y = 0; y < contrib.length; y++) {
+			for (int x = 0; x < contrib[y].length; x++) {
+				String s = contrib[y][x] == null ? "-" : ("" + contrib[y][x].target);
+				while (s.length() < 4)
+					s = " " + s;
+				System.out.print(s);
+			}
+			System.out.println();
+		}
+	}
+
 	// -- Helper classes --
 
+	/** Data structure for tracking contributions. */
 	private static class Contrib {
 
 		private Date date;
@@ -500,7 +534,7 @@ public class ContribHacker {
 		private int current;
 		private int target;
 
-		public Contrib(final Date date, final int initial) {
+		private Contrib(final Date date, final int initial) {
 			this.date = date;
 			this.initial = current = initial;
 		}

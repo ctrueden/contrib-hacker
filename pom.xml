@@ -10,8 +10,8 @@
 	<version>1.0.0-SNAPSHOT</version>
 
 	<name>Contribution Hacker</name>
-	<description>TODO</description>
-	<url>TODO</url>
+	<description>This program hacks your GitHub Contributions Calendar to match an image.</description>
+	<url>https://github.com/ctrueden/contrib-hacker</url>
 	<inceptionYear>2013</inceptionYear>
 
 	<properties>
@@ -88,8 +88,8 @@
 
 	<licenses>
 		<license>
-			<name>TODO</name>
-			<url>TODO</url>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
