@@ -51,6 +51,9 @@ public class ContribHacker {
 
 	// -- Constants --
 
+	private static final String JAR_NAME =
+		"contrib-hacker-1.0.0-SNAPSHOT-jar-with-dependencies.jar";
+
 	private static final String PROJECT_URL =
 		"https://github.com/ctrueden/commit-hacker";
 
@@ -142,8 +145,8 @@ public class ContribHacker {
 			System.err.println();
 
 			// print usage instructions
-			System.err.println("java -jar contrib-hacker-all-1.0.0-SNAPSHOT.jar " +
-				"[options...] arguments...");
+			System.err.println("java -jar " + JAR_NAME +
+				" [options...] arguments...");
 
 			// print the list of available options
 			parser.printUsage(System.err);

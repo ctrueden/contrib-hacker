@@ -6,6 +6,16 @@ user's public space will result in that user's Contributions Calendar
 matching the specified image.
 
 
+Example of usage
+----------------
+
+    mvn
+    java target/contrib-hacker-1.0.0-SNAPSHOT-jar-with-dependencies.jar \
+        -i image_file -u github_user -o output_dir -g
+
+Pass the --help flag for more details.
+
+
 What's in the dummy repository?
 -------------------------------
 
