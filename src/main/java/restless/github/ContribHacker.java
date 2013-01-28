@@ -369,9 +369,6 @@ public class ContribHacker {
 			return;
 		}
 
-		// TODO: parse from GitHub user info
-		author = new PersonIdent("Curtis Rueden", "ctrueden@wisc.edu");
-
 		if (!gitDir.exists()) {
 			final boolean success = gitDir.mkdirs();
 			if (!success) {
@@ -385,6 +382,8 @@ public class ContribHacker {
 		init.call();
 
 		git = Git.open(gitDir);
+
+		author = new PersonIdent(git.getRepository());
 
 		asciiImageFile = new File(gitDir, ASCII_IMAGE_FILE);
 		calendarDataFile = new File(gitDir, CALENDAR_DATA_FILE);
