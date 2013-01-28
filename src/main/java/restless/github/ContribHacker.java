@@ -307,19 +307,51 @@ public class ContribHacker {
 		debug("Scale factor = " + scale);
 
 		// populate new contribution matrix
-		maxContrib = 0;
+		maxContrib = scale(0, scale);
+		boolean maxFulfilled = false;
 		for (int y = 0; y < CAL_HEIGHT; y++) {
 			for (int x = 0; x < CAL_WIDTH; x++) {
 				if (contrib[y][x] == null) continue;
-				final int target = scale(pix[y][x], scale);
-				if (target > maxContrib) maxContrib = target;
+				final int target = scale(pix[y][x], scale, maxFulfilled);
+				if (target == maxContrib) maxFulfilled = true;
 				contrib[y][x].target = target;
 			}
 		}
 	}
 
-	/** Scales the given inverted pixel value by the specified scale factor. */
+	/**
+	 * Scales the given inverted pixel value by the specified scale factor.
+	 * 
+	 * @param pixel The pixel value (0=strongest, 3=weakest)
+	 * @param scale The scale factor
+	 */
 	private int scale(final int pixel, final int scale) {
+		return scale * (4 - pixel);
+	}
+
+	/**
+	 * Scales the given inverted pixel value by the specified scale factor.
+	 * 
+	 * @param pixel The pixel value (0=strongest, 3=weakest)
+	 * @param scale The scale factor
+	 * @param maxFulfilled Whether we have already scaled a maximum intensity
+	 *          pixel. This matters because the first maximum intensity must be
+	 *          scaled to the maximum value (e.g., with a scale factor of 15, one
+	 *          result must be 60 to ensure everything is binned properly from
+	 *          1-15, 16-30, 31-45, and 46-60). But once we have a single maximum
+	 *          value in the picture, the remaining pixels can be scaled to the
+	 *          minimum value of their desired bins, respectively (e.g.,
+	 *          subsequent results can be set to 46 rather than 60 and still
+	 *          appear as maximum intensity pixels).
+	 */
+	private int
+		scale(final int pixel, final int scale, final boolean maxFulfilled)
+	{
+		if (pixel > 0 || maxFulfilled) {
+			// cheating is OK!
+			return scale * (3 - pixel) + 1;
+		}
+		// this is the first maximum intensity pixel; we cannot optimize
 		return scale * (4 - pixel);
 	}
 
