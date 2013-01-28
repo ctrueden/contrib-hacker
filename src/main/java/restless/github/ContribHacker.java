@@ -5,7 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -484,8 +484,14 @@ public class ContribHacker {
 		progressFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		progressFrame.setContentPane(contentPane);
 		progressFrame.pack();
-		// TODO: Center the frame.
-		progressFrame.setLocation(new Point(200, 200));
+
+		// center the window onscreen
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		final Dimension windowSize = progressFrame.getSize();
+		final int posX = (screenSize.width - windowSize.width) / 2;
+		final int posY = (screenSize.height - windowSize.height) / 2;
+		progressFrame.setLocation(posX, posY);
+
 		progressFrame.setVisible(true);
 	}
 
