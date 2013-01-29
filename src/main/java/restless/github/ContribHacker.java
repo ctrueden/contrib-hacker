@@ -454,8 +454,9 @@ public class ContribHacker {
 	/** Writes an updated calendar data file to disk. */
 	private void updateDataFile() throws FileNotFoundException {
 		final PrintWriter out = new PrintWriter(calendarDataFile);
-		for (int y = 0; y < CAL_HEIGHT; y++) {
-			for (int x = 0; x < CAL_WIDTH; x++) {
+		for (int x = 0; x < CAL_WIDTH; x++) {
+			for (int y = 0; y < CAL_HEIGHT; y++) {
+				if (contrib[y][x] == null) continue;
 				out.println(contrib[y][x]);
 			}
 		}
