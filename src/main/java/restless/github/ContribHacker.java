@@ -65,8 +65,11 @@ public class ContribHacker {
 	private static final String CALENDAR_URL = "https://github.com/users/" +
 		USER_TOKEN + "/contributions_calendar_data";
 
-	private static final SimpleDateFormat DATE_FORMAT =
+	private static final SimpleDateFormat GITHUB_DATE_FORMAT =
 		new SimpleDateFormat("yyyy/MM/dd");
+
+	private static final SimpleDateFormat SHORT_DATE_FORMAT =
+		new SimpleDateFormat("yyyyMMdd");
 
 	private static final int CAL_WIDTH = 54;
 	private static final int CAL_HEIGHT = 7;
@@ -388,7 +391,7 @@ public class ContribHacker {
 		final int quote = date.indexOf("\"");
 		final String unwrappedDate = quote < 0 ? date :
 			date.substring(quote + 1, date.lastIndexOf("\""));
-		return DATE_FORMAT.parse(unwrappedDate);
+		return GITHUB_DATE_FORMAT.parse(unwrappedDate);
 	}
 
 	// -- Helper methods - Git --
@@ -456,7 +459,11 @@ public class ContribHacker {
 		final PrintWriter out = new PrintWriter(calendarDataFile);
 		for (int x = 0; x < CAL_WIDTH; x++) {
 			for (int y = 0; y < CAL_HEIGHT; y++) {
-				if (contrib[y][x] == null) continue;
+				if (contrib[y][x] == null ||
+					contrib[y][x].current - contrib[y][x].initial == 0)
+				{
+					continue;
+				}
 				out.println(contrib[y][x]);
 			}
 		}
@@ -589,7 +596,7 @@ public class ContribHacker {
 
 		@Override
 		public String toString() {
-			return DATE_FORMAT.format(date) + ": " + (current - initial);
+			return SHORT_DATE_FORMAT.format(date) + " " + (current - initial);
 		}
 
 	}
