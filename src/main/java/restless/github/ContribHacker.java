@@ -298,6 +298,15 @@ public class ContribHacker {
 		// method is performant enough and hopefully easy to understand.
 
 		// compute minimum scale factor needed for desired image
+		//
+		// TODO: rather than scaling up and comparing... search for maxContrib
+		// directly? Need to robustly convert from maxContrib to the four bin
+		// ranges. Look at various GitHub users to derive the formula.
+		// Can still use the same strategy of looping only once through (y, x),
+		// increasing maxContrib as needed when one of the pixels fails.
+		//
+		// Also should think about what to do if *no* pixel has max value...
+		// for now might be easiest to just document that such is unsupported.
 		int scale = 1;
 		for (int y = 0; y < CAL_HEIGHT; y++) {
 			for (int x = 0; x < CAL_WIDTH; x++) {
