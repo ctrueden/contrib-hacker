@@ -90,11 +90,11 @@ public class ContribHacker {
 
 	@Option(name = "-i", aliases = {"--image"},
 		usage = "the target image file")
-	private File imageFile = new File("samples/hello-world.png");//TEMP
+	private File imageFile = new File("samples/hello-world.png");
 
 	@Option(name = "-u", aliases = {"--github-user"},
 		usage = "the GitHub username")
-	private String githubUser = "ctrueden";//TEMP
+	private String githubUser;
 
 	@Option(name = "-o", aliases = {"--output-dir"},
 		usage = "the directory where the Git repository should be populated")
@@ -102,10 +102,10 @@ public class ContribHacker {
 
 	@Option(name = "-g", aliases = {"--gui"},
 		usage = "display progress in a graphical window")
-	private boolean showGUI = true;//TEMP
+	private boolean showGUI;
 
 	@Option(name = "-d", aliases = {"--debug"}, usage = "debug mode")
-	private boolean debug = true;//TEMP
+	private boolean debug;
 
 	// -- Fields --
 
