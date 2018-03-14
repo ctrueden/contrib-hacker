@@ -1,7 +1,7 @@
 ***NB: THIS PROJECT IS UNFINISHED. Unfortunately, for time reasons, I will
 probably not have time to finish it any time soon. The main hangup is that it
 is tricky to figure out how GitHub scales the contribution matrix, since it
-appears to be non-linear.***
+appears to be non-linear. See also https://www.npmjs.com/package/grafgiti ***
 
 This program hacks your GitHub Contributions Calendar to match an image.
 
