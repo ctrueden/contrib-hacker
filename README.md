@@ -5,6 +5,7 @@ is tricky to figure out how GitHub scales the contribution matrix, since it
 appears to be non-linear. See also https://www.npmjs.com/package/grafgiti
 </strong>
 
+
 This program hacks your GitHub Contributions Calendar to match an image.
 
 More specifically, given an image file and GitHub username as input, it
