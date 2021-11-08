@@ -120,7 +120,7 @@
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:git://github.com/ctrueden/contrib-hacker.git</connection>
+		<connection>scm:git:https://github.com/ctrueden/contrib-hacker.git</connection>
 		<developerConnection>scm:git:git@github.com:ctrueden/contrib-hacker.git</developerConnection>
 		<tag>HEAD</tag>
 		<url>https://github.com/ctrueden/contrib-hacker</url>
